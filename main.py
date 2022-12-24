@@ -13,9 +13,12 @@ class MainClass:
         self.dirImages = []
         self.columnArticles = 'B'
         self.columnImages = 'A'
+        self.selectedSheet = ''
 
     def startApp(self):
         root = tk.Tk()
+
+        # all possible columns
         alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
                     'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK',
                     'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ', 'BA',
@@ -64,62 +67,92 @@ class MainClass:
         root.title("Main")
         root.configure(background="black")
 
+        # grid layout
         buttonFrame = tk.Frame(root, background='light gray')
         buttonFrame.columnconfigure(0, weight=1)
         buttonFrame.columnconfigure(1, weight=1)
 
         buttonFrame.pack(pady=160, padx=0)
 
+        # label, combobox list
+        labelSheets=tk.Label(buttonFrame,text="Select a sheet of excel file for next operations", font=('Arial', 15), background='light gray')
+        labelSheets.grid(row=0, column=1, columnspan=2, sticky=tk.E+tk.W)
+
+        # label, has been excel file selected
         labelExcel = tk.Label(buttonFrame, text="          File is not selected         ", foreground='red',
                               font=('Arial', 10))
         labelExcel.grid(row=1, column=0)
 
+        # label, has been folder selected?
         labelImage = tk.Label(buttonFrame, text="        Folder is not selected       ", foreground='red',
                               font=('Arial', 10))
         labelImage.grid(row=3, column=0)
 
+        # label, is button insert pressed?
         labelInsert = tk.Label(buttonFrame, text="Click Insert to insert images into excel file", foreground='red',
                                font=('Arial', 11))
-        labelInsert.grid(row=5, column=0, sticky=tk.E + tk.W, columnspan=2)
+        labelInsert.grid(row=5, column=0, sticky=tk.E + tk.W, columnspan=3)
 
+        # combobox excel sheets
+        sheets = ttk.Combobox(buttonFrame, values=[])
+        sheets.grid(row=1, column=1, columnspan=2)
+        sheets.bind('<<ComboboxSelected>>', self.sheetChanged)
+
+        # button select excel file
         buttonExcel = tk.Button(buttonFrame, text="Load excel file", font=('Arial', 17),
-                                command=lambda: self.openFile(labelExcel, labelInsert))
+                                command=lambda: self.openFile(labelExcel, labelInsert, sheets))
         buttonExcel.grid(row=0, column=0, sticky=tk.E + tk.W)
 
+        # button select image folder
         buttonImage = tk.Button(buttonFrame, text="Load image folder", font=('Arial', 17), width=10,
                                 command=lambda: self.openImage(labelImage, labelInsert))
         buttonImage.grid(row=2, column=0, sticky=tk.E + tk.W)
 
+        # button insert
         buttonSave = tk.Button(buttonFrame, text="Insert", font=('Arial', 19),
                                command=lambda: self.saveImage(labelInsert))
-        buttonSave.grid(row=4, column=0, sticky=tk.E + tk.W, columnspan=2)
+        buttonSave.grid(row=4, column=0, sticky=tk.E + tk.W, columnspan=3)
 
+        # instructions label
         labelArticles = tk.Label(buttonFrame, text="Select the excel column\n"
                                                    "where the codes are located", font=('Arial', 11),
                                  background='light gray')
-        labelArticles.grid(row=0, column=1)
+        labelArticles.grid(row=2, column=1)
 
+        # instructions label
         labelImages = tk.Label(buttonFrame, text="Select the excel column\n"
                                                  "where the images will be located", font=('Arial', 11),
                                background='light gray')
-        labelImages.grid(row=2, column=1)
+        labelImages.grid(row=2, column=2)
 
+
+
+
+
+        # combobox articles column
         columnArticles = ttk.Combobox(buttonFrame, values=alphabet, font=('Arial', 12), background='light gray')
-        columnArticles.grid(row=1, column=1)
+        columnArticles.grid(row=3, column=1)
         columnArticles.set("Column with Numbers")
 
         columnArticles.bind('<<ComboboxSelected>>', self.articlesChanged)
 
+        # combobox image column
         columnImages = ttk.Combobox(buttonFrame, values=alphabet, font=('Arial', 12), background='black')
         columnImages.set("Column for images")
-        columnImages.grid(row=3, column=1)
+        columnImages.grid(row=3, column=2)
 
         columnImages.bind('<<ComboboxSelected>>', self.imagesChanged)
 
+        # quit button
         quit = tk.Button(buttonFrame, text="Quit", font=('Arial', 19), command=self.quitcode)
-        quit.grid(row=6, column=0, sticky=tk.E + tk.W, columnspan=2)
+        quit.grid(row=6, column=0, sticky=tk.E + tk.W, columnspan=3)
 
         root.mainloop()
+
+    def sheetChanged(self, event):
+        self.selectedSheet= event.widget.get()
+        print(event.widget.get())
+
 
     def articlesChanged(self, event):
         self.columnArticles = event.widget.get()
@@ -129,7 +162,7 @@ class MainClass:
         self.columnImages = event.widget.get()
         print(self.columnImages)
 
-    def openFile(self, label, labelInsert):
+    def openFile(self, label, labelInsert,combobox):
         tempdir = filedialog.askopenfilename(initialdir="/", title="Select An Excel File", filetypes=(
             ("excel files", "*.xlsx"), ("All files", "*.*")))
         if len(tempdir) > 0:
@@ -137,6 +170,13 @@ class MainClass:
             label.configure(text="      File has been selected      ", foreground='green')
             labelInsert.configure(text="Click Insert to insert images into excel file", foreground='red',
                                   font=('Arial', 11))
+
+            arr_of_sheets= (openpyxl.load_workbook(tempdir)).sheetnames
+            combobox.configure(values=arr_of_sheets)
+            combobox.set(arr_of_sheets[0])
+            combobox.update()
+            combobox.configure()
+
         label.update()
         labelInsert.update()
         print(tempdir)
@@ -156,33 +196,46 @@ class MainClass:
 
     def saveImage(self, label):
 
-        if self.filepath != '' and self.dirImages != []:
+        if self.filepath != '' and self.dirImages != [] and self.selectedSheet!='':
             try:
                 start = 1
                 finish = len(self.dirImages)
                 for i in range(start, finish + 1):
-                    workbook = openpyxl.load_workbook(self.filepath)                        # opening workbook
-                    worksheet = workbook["List1"]                                           # opening sheet 1
-                    artical_number = str(worksheet[self.columnArticles + str(i)].value)     # unique number of
-                                                                                            # product in cell
+
+                    # opening workbook
+                    workbook = openpyxl.load_workbook(self.filepath)
+
+                    # opening sheet 1
+                    worksheet = workbook["List1"]
+
+                    # unique number of product in cell
+                    artical_number = str(worksheet[self.columnArticles + str(i)].value)
+
 
                     for j in range(finish):
                         if artical_number in self.dirImages[j]:
-                            img = Image.open(str(self.imagePath + "/" + self.dirImages[j]))  # opening an image
+                            # opening an image
+                            img = Image.open(str(self.imagePath + "/" + self.dirImages[j]))
                             img1 = openpyxl.drawing.image.Image(img)
-                            img1.width = 200 * img1.width / img1.height                      # Set new image size
+
+                            # Set new image size
+                            img1.width = 200 * img1.width / img1.height
                             img1.height = 200
 
-                            worksheet.row_dimensions[i].height = int(150)                    # Set row and column
-                            worksheet.column_dimensions[self.columnImages].width = 44.6      # width and height
+                            # Set row and column
+                            worksheet.row_dimensions[i].height = int(150)
+
+                            # width and height
+                            worksheet.column_dimensions[self.columnImages].width = 44.6
 
                             cell = worksheet[self.columnImages + str(i)]
                             cell.alignment = Alignment(horizontal='right')
-                            worksheet.add_image(img1, self.columnImages + str(i))            # Adding image to worksheet
+                            worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
 
-                            workbook.save(self.filepath)                                     # Saving a document
+                            workbook.save(self.filepath)  # Saving a document
 
                             break
+
                 label.configure(text="File data has been updated!", foreground='green')
                 label.update()
                 print("Program is successful")
