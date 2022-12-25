@@ -182,6 +182,7 @@ class MainClass:
         print(tempdir)
 
     def openImage(self, label, labelInsert):
+
         tempdir = filedialog.askdirectory(initialdir="/", title="Select An Image Folder")
         if len(tempdir) > 0:
             self.imagePath = tempdir
@@ -196,24 +197,30 @@ class MainClass:
 
     def saveImage(self, label):
 
-        if self.filepath != '' and self.dirImages != [] and self.selectedSheet!='':
+        if self.filepath != '' and self.dirImages != [] :
+            label.configure(text="0/"+str(len(self.dirImages)))
+            label.update()
             try:
+                # opening workbook
+                workbook = openpyxl.load_workbook(self.filepath)
+
+                # opening sheet 1
+                worksheet = workbook["List1"]
                 start = 1
                 finish = len(self.dirImages)
                 for i in range(start, finish + 1):
 
-                    # opening workbook
-                    workbook = openpyxl.load_workbook(self.filepath)
 
-                    # opening sheet 1
-                    worksheet = workbook["List1"]
 
                     # unique number of product in cell
                     artical_number = str(worksheet[self.columnArticles + str(i)].value)
 
 
                     for j in range(finish):
-                        if artical_number in self.dirImages[j]:
+                        imgNum=os.path.splitext(self.dirImages[j])[0]
+
+
+                        if artical_number == imgNum:
                             # opening an image
                             img = Image.open(str(self.imagePath + "/" + self.dirImages[j]))
                             img1 = openpyxl.drawing.image.Image(img)
@@ -232,10 +239,11 @@ class MainClass:
                             cell.alignment = Alignment(horizontal='right')
                             worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
 
-                            workbook.save(self.filepath)  # Saving a document
 
+                            label.configure(text=str(i) +"/" + str(len(self.dirImages)))
+                            label.update()
                             break
-
+                workbook.save(self.filepath)  # Saving a document
                 label.configure(text="File data has been updated!", foreground='green')
                 label.update()
                 print("Program is successful")
