@@ -1,3 +1,5 @@
+import sys
+
 import openpyxl
 from PIL import Image
 import os
@@ -403,7 +405,7 @@ class MainClass:
 
 
             #quit button
-        quitButton = customtkinter.CTkButton(buttonFrame, text="Quit", font=('Arial', 17), command=quit)
+        quitButton = customtkinter.CTkButton(buttonFrame, text="Quit", font=('Arial', 17), command=sys.exit)
         quitButton.grid(row=5, column=0, padx=20, pady=(105, 20), sticky="nsew")
 
         root.mainloop()
@@ -520,6 +522,6 @@ class MainClass:
                 label.configure(text="Something went wrong", text_color="orange")
                 label.update()
 
-
+#
 m = MainClass()
 m.startApp()
