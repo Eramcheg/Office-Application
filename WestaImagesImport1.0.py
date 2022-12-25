@@ -13,8 +13,8 @@ customtkinter.set_default_color_theme("dark-blue")
 
 class MainClass:
     def __init__(self):
-        self.rowArticles = None
-        self.rowImages = None
+        self.rowStart = 1
+        self.rowEnd = 2
         self.imagePath = None
         self.filepath = ""
         self.dirImages = []
@@ -326,17 +326,17 @@ class MainClass:
 
         labelImageFolder = customtkinter.CTkLabel(labelFrame, text="Image folder path: folder is not selected",
                                                   text_color='red', font=('Arial', 18))
-        labelImageFolder.grid(row=6, column=0, columnspan=2, padx=20, pady=21, sticky="nsew")
+        labelImageFolder.grid(row=7, column=0, columnspan=2, padx=20, pady=(10,0), sticky="nsew")
 
 
         labelInstructionsCodes = customtkinter.CTkLabel(labelFrame, text="Select the excel column with codes location\n"
-                                                  " and row where codes location starts", font=('Arial', 15))
+                                                  " and column for images location", font=('Arial', 15))
         labelInstructionsCodes.grid(row=2, column=0, padx=20, pady=0, columnspan=2, sticky="nsew")
 
 
 
         labelInstructionsImg = customtkinter.CTkLabel(labelFrame,
-                                                      text="Select the excel column where images will be located",
+                                                      text="Select the start row and end row for images placement",
                                                       font=('Arial', 15))
         labelInstructionsImg.grid(row=4, column=0, padx=20, pady=(10, 0), columnspan=2, sticky="nsew")
 
@@ -361,19 +361,23 @@ class MainClass:
         columnArticles = customtkinter.CTkComboBox(labelFrame, values=alphabet, font=('Arial', 12), command=self.articlesColumnChanged)
         columnArticles.grid(row=3, column=0, padx=2, pady=0)
         columnArticles.set("Codes Column")
-        rowArticles = customtkinter.CTkComboBox(labelFrame, values=rows, font=('Arial', 12), command=self.articlesRowChanged)
-        rowArticles.grid(row=3, column=1, padx=2, pady=0)
-        rowArticles.set("Codes Row")
-
-
 
             # combobox images column and row
-        columnImg = customtkinter.CTkComboBox(labelFrame, values=alphabet, font=('Arial', 12), command=self.imagesColumnChanged)
-        columnImg.grid(row=5, column=0, padx=2, pady=(0,5))
+        columnImg = customtkinter.CTkComboBox(labelFrame, values=alphabet, font=('Arial', 12),
+                                              command=self.imagesColumnChanged)
+        columnImg.grid(row=3, column=1, padx=2, pady=(0, 5))
         columnImg.set("Images Column")
-        # rowImg = customtkinter.CTkComboBox(labelFrame, values=rows, font=('Arial', 12), command=self.imagesRowChanged)
-        # rowImg.grid(row=5, column=1, padx=2, pady=0)
-        # rowImg.set("Images Row")
+
+
+        rowStart = customtkinter.CTkComboBox(labelFrame, values=rows, font=('Arial', 12), command=self.articlesRowChanged)
+        rowStart.grid(row=5, column=0, padx=2, pady=0)
+        rowStart.set("Start row")
+
+        rowEnd=customtkinter.CTkEntry(labelFrame, placeholder_text="Write end row(number)")
+        rowEnd.grid(row=5, column=1, padx=(2,0), pady=0)
+        # rowEnd = customtkinter.CTkComboBox(labelFrame, values=rows, font=('Arial', 12), command=self.imagesRowChanged)
+        # rowEnd.grid(row=5, column=1, padx=2, pady=0)
+        # rowEnd.set("End row ")
 
 
 
@@ -396,7 +400,7 @@ class MainClass:
             # Open image folder button
         buttonOpenImgFolder = customtkinter.CTkButton(buttonFrame, text="Load image folder", font=('Arial', 17),
                                                       command=lambda: self.openImage(labelImageFolder, labelProgress))
-        buttonOpenImgFolder.grid(row=4, column=0, padx=20, pady=(96,0))
+        buttonOpenImgFolder.grid(row=4, column=0, padx=20, pady=(115,0))
 
             # Open excel file button
         buttonOpenExcel = customtkinter.CTkButton(buttonFrame, text="Load excel file", font=('Arial', 17),
@@ -404,9 +408,14 @@ class MainClass:
         buttonOpenExcel.grid(row=1, column=0, padx=20, pady=20)
 
 
+        confirmButton = customtkinter.CTkButton(labelFrame, text="Confirm", font=('Arial', 11),
+                                                command=lambda: self.confirmEntry(rowEnd))
+        confirmButton.grid(row=6, column=1, padx=0, pady=0)
+
+
             #quit button
         quitButton = customtkinter.CTkButton(buttonFrame, text="Quit", font=('Arial', 17), command=sys.exit)
-        quitButton.grid(row=5, column=0, padx=20, pady=(105, 20), sticky="nsew")
+        quitButton.grid(row=5, column=0, padx=20, pady=(70, 20), sticky="nsew")
 
         root.mainloop()
 
@@ -417,17 +426,28 @@ class MainClass:
         self.columnArticles = event
         print(self.columnArticles)
 
+    def confirmEntry(self, endRow):
+        try:
+            self.rowEnd=int(endRow.get())
+            endRow.configure(text_color="green")
+            endRow.update()
+            print(self.rowEnd)
+        except:
+            endRow.configure(text_color="red")
+            endRow.configure(placeholder_text="Value must be a num!")
+
+
     def articlesRowChanged(self, event):
-        self.rowArticles = event
-        print(self.rowArticles)
+        self.rowStart = event
+        print(self.rowStart)
 
     def imagesColumnChanged(self, event):
         self.columnImages = event
         print(self.columnImages)
 
     def imagesRowChanged(self, event):
-        self.rowImages = event
-        print(self.rowImages)
+        self.rowEnd = event
+        print(self.rowEnd)
 
     def openFile(self, label, labelInsert, combobox):
         tempdir = filedialog.askopenfilename(initialdir="/", title="Select An Excel File", filetypes=(
@@ -441,6 +461,7 @@ class MainClass:
             arr_of_sheets = (openpyxl.load_workbook(tempdir)).sheetnames
             combobox.configure(values=arr_of_sheets)
             combobox.set(arr_of_sheets[0])
+            self.selectedSheet =arr_of_sheets[0]
             combobox.update()
             combobox.configure()
 
@@ -456,13 +477,20 @@ class MainClass:
             label.configure(text="Image folder path: " + tempdir, text_color='green')
             labelInsert.configure(text="Click Insert to insert images into excel file", text_color='white',
                                   font=('Arial', 15))
+
+
+
             label.update()
             labelInsert.update()
             self.dirImages = os.listdir(tempdir)
+            self.rowEnd = len(self.dirImages)
+            # rowEnd.set("Default = "+str(self.rowEnd))
+            # rowEnd.update()
             self.imagePath = tempdir
             print(tempdir)
 
     def saveImage(self, label, progressbar):
+
 
         if self.filepath != '' and self.dirImages != []:
 
@@ -474,11 +502,15 @@ class MainClass:
                 workbook = openpyxl.load_workbook(self.filepath)
 
                 # opening sheet 1
-                worksheet = workbook["List1"]
+                worksheet = workbook[self.selectedSheet]
 
-                start = int(self.rowArticles)
+                start = int(self.rowStart)
+                end= int(self.rowEnd)+1
+
+                progressMax=end-start+1
+
                 finish = len(self.dirImages)
-                for i in range(start, finish + int(self.rowArticles)):
+                for i in range(start, end):
 
                     # unique number of product in cell
                     artical_number = str(worksheet[self.columnArticles + str(i)].value)
@@ -505,12 +537,13 @@ class MainClass:
                             cell.alignment = Alignment(horizontal='right')
                             worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
 
-                            progressbar.set(float(i / len(self.dirImages)))
+                            progressbar.set(float(i / progressMax))
                             if i != len(self.dirImages):
-                                label.configure(text=str(i+1 - int(self.rowArticles)) + "/" + str(len(self.dirImages)))
+                                label.configure(text=str(i+1 - int(self.rowStart)) + "/" + str(len(self.dirImages)))
                             label.update()
 
                             break
+                progressbar.set(1)
                 label.configure(text="Please wait, changes are being applied to the file")
                 label.update()
                 workbook.save(self.filepath)  # Saving a document
@@ -518,6 +551,9 @@ class MainClass:
                 label.update()
                 print("Program is successful")
 
+            except PermissionError:
+                label.configure(text="Please, close active excel file and try again", text_color="orange")
+                label.update()
             except:
                 label.configure(text="Something went wrong", text_color="orange")
                 label.update()
