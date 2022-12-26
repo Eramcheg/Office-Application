@@ -411,7 +411,7 @@ class MainClass:
             # Open image folder button
         buttonOpenImgFolder = customtkinter.CTkButton(buttonFrame, text="Load image folder", font=('Arial', 17),
                                                       command=lambda: self.openImage(labelImageFolder, labelProgress))
-        buttonOpenImgFolder.grid(row=8, column=0, padx=20, pady=(115,0))
+        buttonOpenImgFolder.grid(row=8, column=0, padx=20, pady=(95,0))
 
             # Open excel file button
         buttonOpenExcel = customtkinter.CTkButton(buttonFrame, text="Load excel file", font=('Arial', 17),
@@ -428,7 +428,7 @@ class MainClass:
 
             #quit button
         quitButton = customtkinter.CTkButton(buttonFrame, text="Quit", font=('Arial', 17), command=sys.exit)
-        quitButton.grid(row=9, column=0, padx=20, pady=(70, 20), sticky="nsew")
+        quitButton.grid(row=9, column=0, padx=20, pady=(60, 20), sticky="nsew")
 
 
         switch_1 = customtkinter.CTkSwitch(master=buttonFrame, text="Show edition", onvalue="on", offvalue="off",
