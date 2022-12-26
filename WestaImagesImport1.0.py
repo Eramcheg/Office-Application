@@ -578,7 +578,7 @@ class MainClass:
                             worksheet.row_dimensions[i].height = (self.size/4)*3
 
                             # width and height
-                            worksheet.column_dimensions[self.columnImages].width = 44.6
+                            worksheet.column_dimensions[self.columnImages].width = img1.width/7.5
 
                             cell = worksheet[self.columnImages + str(i)]
                             cell.alignment = Alignment(horizontal='right')
