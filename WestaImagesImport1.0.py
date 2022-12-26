@@ -13,6 +13,7 @@ customtkinter.set_default_color_theme("dark-blue")
 
 class MainClass:
     def __init__(self):
+        self.size = 200
         self.rowStart = 1
         self.rowEnd = 2
         self.imagePath = None
@@ -380,13 +381,23 @@ class MainClass:
         # rowEnd.set("End row ")
 
 
-
+        labelSize=customtkinter.CTkLabel(buttonFrame, text="Write custom images height\nfor loading in excel (px).")
+        labelSize.grid(row=5,column=0,padx=20,pady=0)
+        labelSize.grid_remove()
+        entrySize=customtkinter.CTkEntry(buttonFrame, placeholder_text="Default = 200px")
+        entrySize.grid(row=6, column=0, padx=20,pady=0)
+        entrySize.grid_remove()
+        buttonConfirmSize=customtkinter.CTkButton(buttonFrame, text="Confirm", command=lambda: self.confirmSwitch(entrySize))
+        buttonConfirmSize.grid(row=7, column=0, padx=20,pady=0)
+        buttonConfirmSize.grid_remove()
 
 
         # OTHER ELEMENTS
         progressbar_1 = customtkinter.CTkProgressBar(insertFrame)
         progressbar_1.grid(row=3, column=1, padx=(20, 10), pady=(0, 10), sticky="ew")
         progressbar_1.set(0)
+
+
 
 
 
@@ -400,7 +411,7 @@ class MainClass:
             # Open image folder button
         buttonOpenImgFolder = customtkinter.CTkButton(buttonFrame, text="Load image folder", font=('Arial', 17),
                                                       command=lambda: self.openImage(labelImageFolder, labelProgress))
-        buttonOpenImgFolder.grid(row=4, column=0, padx=20, pady=(115,0))
+        buttonOpenImgFolder.grid(row=8, column=0, padx=20, pady=(115,0))
 
             # Open excel file button
         buttonOpenExcel = customtkinter.CTkButton(buttonFrame, text="Load excel file", font=('Arial', 17),
@@ -413,15 +424,51 @@ class MainClass:
         confirmButton.grid(row=6, column=1, padx=0, pady=0)
 
 
+
+
             #quit button
         quitButton = customtkinter.CTkButton(buttonFrame, text="Quit", font=('Arial', 17), command=sys.exit)
-        quitButton.grid(row=5, column=0, padx=20, pady=(70, 20), sticky="nsew")
+        quitButton.grid(row=9, column=0, padx=20, pady=(70, 20), sticky="nsew")
+
+
+        switch_1 = customtkinter.CTkSwitch(master=buttonFrame, text="Show edition", onvalue="on", offvalue="off",
+                                           command=lambda: self.hide_element(entrySize, switch_1, buttonConfirmSize,
+                                                                             labelSize, quitButton, buttonOpenImgFolder))
+        switch_1.grid(row=4, column=0, padx=20, pady=0)
+
 
         root.mainloop()
+
+    def confirmSwitch(self, entrySize):
+
+        try:
+            self.size=int(entrySize.get())
+            entrySize.configure(text_color="green")
+            entrySize.update()
+            print(self.rowEnd)
+        except:
+            entrySize.configure(text_color="red")
+            entrySize.configure(placeholder_text="Value must be a num!")
+
+    def hide_element(self, entrySize, switch1, confirm, labelSize, quitBut, openImg):
+        if switch1.get()=='off':
+            entrySize.grid_remove()
+            confirm.grid_remove()
+            labelSize.grid_remove()
+            quitBut.grid(pady=8)
+            openImg.grid(pady=(95,50))
+
+        else:
+            entrySize.grid()
+            confirm.grid()
+            labelSize.grid()
+            quitBut.grid(pady=50)
+            openImg.grid(pady=9)
 
     def sheetChanged(self, event):
         self.selectedSheet = event
         print(self.selectedSheet)
+
     def articlesColumnChanged(self, event):
         self.columnArticles = event
         print(self.columnArticles)
@@ -524,11 +571,11 @@ class MainClass:
                             img1 = openpyxl.drawing.image.Image(img)
 
                             # Set new image size
-                            img1.width = 200 * img1.width / img1.height
-                            img1.height = 200
+                            img1.width = self.size * img1.width / img1.height
+                            img1.height = self.size
 
                             # Set row and column
-                            worksheet.row_dimensions[i].height = int(150)
+                            worksheet.row_dimensions[i].height = (self.size/4)*3
 
                             # width and height
                             worksheet.column_dimensions[self.columnImages].width = 44.6
