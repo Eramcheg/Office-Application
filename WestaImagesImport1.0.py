@@ -13,6 +13,8 @@ customtkinter.set_default_color_theme("dark-blue")
 
 class MainClass:
     def __init__(self):
+
+        # function 1
         self.size = 200
         self.rowStart = 1
         self.rowEnd = 2
@@ -22,12 +24,39 @@ class MainClass:
         self.columnArticles = 'B'
         self.columnImages = 'A'
         self.selectedSheet = ''
+        self.maxSize = 200
+
+
+        # function 2
+        self.sheetFirst=None
+        self.sheetSecond=None
+        self.firstfileF2=''
+        self.secondfileF2=''
+
 
     def startApp(self):
         root = customtkinter.CTk()
         root.grid_columnconfigure(1, weight=1)
         root.grid_columnconfigure((2, 3), weight=0)
         root.grid_rowconfigure((0, 1, 2), weight=1)
+
+        frame=customtkinter.CTkFrame(root)
+        frame.grid(row=0, column=0, rowspan=4,columnspan=4, sticky="nsew")
+
+        tabview = customtkinter.CTkTabview(frame, width=250)
+        tabview.grid(row=0, column=0, padx=(0, 0), pady=(0, 0), sticky="nsew")
+        tabview.add("Images Import")
+        tabview.add("Synchronizing")
+        tabview.add("Tab 3")
+        tabview.tab("Images Import").grid_columnconfigure(1, weight=1)
+        tabview.tab("Images Import").grid_columnconfigure((2, 3), weight=0)
+        tabview.tab("Images Import").grid_rowconfigure((0, 1, 2), weight=1)
+
+        tabview.tab("Synchronizing").grid_columnconfigure(1, weight=1)
+        tabview.tab("Synchronizing").grid_columnconfigure((2, 3), weight=0)
+        tabview.tab("Synchronizing").grid_rowconfigure((0, 1, 2), weight=1)
+
+
 
         # all possible columns
         alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
@@ -295,21 +324,21 @@ class MainClass:
                 '2978', '2979', '2980', '2981', '2982', '2983', '2984', '2985', '2986', '2987', '2988', '2989', '2990',
                 '2991', '2992', '2993', '2994', '2995', '2996', '2997', '2998', '2999', '3000']
 
-        root.geometry("650x400")
-        root.title("Westa Images Import")
+        root.geometry("645x425")
+        root.title("Westa GmbH Images Import")
         root.configure(background="black")
 
-
+        #function 1
 
         # ALL FRAMES
 
-        buttonFrame = customtkinter.CTkFrame(root)
+        buttonFrame = customtkinter.CTkFrame(tabview.tab("Images Import"))
         buttonFrame.grid(row=0, column=0, rowspan=4, sticky="nsew")
 
-        labelFrame = customtkinter.CTkFrame(root)
+        labelFrame = customtkinter.CTkFrame(tabview.tab("Images Import"))
         labelFrame.grid(row=0, column=1, sticky="nsew")
 
-        insertFrame = customtkinter.CTkFrame(root, fg_color='transparent')
+        insertFrame = customtkinter.CTkFrame(tabview.tab("Images Import"), fg_color='transparent')
         insertFrame.grid(row=1, column=1, sticky="nsew")
 
 
@@ -437,12 +466,133 @@ class MainClass:
         switch_1.grid(row=4, column=0, padx=20, pady=0)
 
 
+
+
+
+
+
+
+
+
+        # Function 2
+
+        #Live coding от ерамчика
+
+        mainFrame= customtkinter.CTkFrame(tabview.tab("Synchronizing"))
+        mainFrame.grid(row=0, column=0, rowspan=4, sticky="nsew")
+
+        userSet=['List to list', 'File to file']
+
+
+
+
+        labelFile1 = customtkinter.CTkLabel(mainFrame, text="File path: file has is not selected")
+        labelFile1.grid(row=2, column=0, padx=20, pady=0)
+
+        labelFile2 = customtkinter.CTkLabel(mainFrame, text="File path: file has is not selected")
+        labelFile2.grid(row=2, column=1, padx=20, pady=0)
+
+        labelFile3 = customtkinter.CTkLabel(mainFrame, text="File path: file has is not selected")
+        labelFile3.grid(row=2, column=0, columnspan=2, padx=20, pady=0)
+
+
+
+        sheets1 = customtkinter.CTkComboBox(mainFrame, values=[], command=self.sheetChanged)
+        sheets1.grid(row=3, column=0, padx=20, pady=1)
+        sheets1.set("Workbook sheet ")
+
+        sheets2 = customtkinter.CTkComboBox(mainFrame, values=[], command=self.sheetChanged)
+        sheets2.grid(row=3, column=1, padx=20, pady=1)
+        sheets2.set("Workbook sheet ")
+
+
+        # Open excel file button
+        buttonOpenExcel1 = customtkinter.CTkButton(mainFrame, text="Load first excel file", font=('Arial', 17),
+                                                   command=lambda:self.openFileFun2(sheets1, labelFile1, 1))
+        buttonOpenExcel1.grid(row=1, column=0, padx=20, pady=20)
+
+        buttonOpenExcel2 = customtkinter.CTkButton(mainFrame, text="Load second excel file", font=('Arial', 17),
+                                                   command=lambda:self.openFileFun2(sheets2, labelFile2, 2))
+        buttonOpenExcel2.grid(row=1, column=1, padx=20, pady=20)
+
+        buttonOpenExcel3 = customtkinter.CTkButton(mainFrame, text="Load excel file", font=('Arial', 17))
+        buttonOpenExcel3.grid(row=1, column=0,columnspan=2 ,padx=20, pady=20)
+
+
+
+
+
+        uploadSet = customtkinter.CTkComboBox(mainFrame, values=userSet,
+                                              command=lambda event: self.changedRelative( event,buttonOpenExcel1, buttonOpenExcel2,
+                                                                                          buttonOpenExcel3, labelFile1, labelFile2, labelFile3))
+        uploadSet.grid(row=0, column=0, columnspan=2, padx=20)
+
+        buttonOpenExcel1.grid_remove()
+        buttonOpenExcel2.grid_remove()
+        buttonOpenExcel3.grid_remove()
+        labelFile1.grid_remove()
+        labelFile2.grid_remove()
+        labelFile3.grid_remove()
+
+
+
+
+
+
+
+
         root.mainloop()
+    def openFileFun2(self, comboboxFirst, label, num):
+        tempdir = filedialog.askopenfilename(initialdir="/", title="Select An Excel File", filetypes=(
+            ("excel files", "*.xlsx"), ("All files", "*.*")))
+        if len(tempdir) > 0:
+            if num==1:
+                self.firstfileF2=tempdir
+
+            else:
+                self.secondfileF2=tempdir
+            label.configure(text="Excel file path: " + tempdir, text_color='green')
+            arr_of_sheets = (openpyxl.load_workbook(tempdir)).sheetnames
+            comboboxFirst.configure(values=arr_of_sheets)
+            comboboxFirst.set(arr_of_sheets[0])
+            self.selectedSheet =arr_of_sheets[0]
+            comboboxFirst.update()
+            comboboxFirst.configure()
+        label.update()
+    def changedRelative(self, event, but1, but2, but3, lbl1, lbl2, lbl3):
+        print(event)
+        if event == "List to list":
+            but3.grid()
+            lbl3.grid()
+            but1.grid_remove()
+            but2.grid_remove()
+            lbl1.grid_remove()
+            lbl2.grid_remove()
+        else:
+            but3.grid_remove()
+            lbl3.grid_remove()
+            but1.grid()
+            but2.grid()
+            lbl1.grid()
+            lbl2.grid()
+
+
+
+
+
+
+
+
+
+
+
 
     def confirmSwitch(self, entrySize):
 
         try:
             self.size=int(entrySize.get())
+            if self.size > self.maxSize:
+                self.maxSize=self.size
             entrySize.configure(text_color="green")
             entrySize.update()
             print(self.rowEnd)
@@ -575,9 +725,10 @@ class MainClass:
                             img1.height = self.size
 
                             # Set row and column
-                            worksheet.row_dimensions[i].height = (self.size/4)*3
+                            worksheet.row_dimensions[i].height = (self.maxSize/4)*3
 
                             # width and height
+
                             worksheet.column_dimensions[self.columnImages].width = img1.width/7.5
 
                             cell = worksheet[self.columnImages + str(i)]
