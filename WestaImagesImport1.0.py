@@ -1,6 +1,7 @@
 import sys
-
+import lxml
 import openpyxl
+from openpyxl import Workbook
 from PIL import Image
 import os
 from tkinter import filedialog
@@ -655,7 +656,8 @@ class MainClass:
             labelInsert.configure(text="Click Insert to insert images into excel file", text_color='white',
                                   font=('Arial', 15))
 
-            arr_of_sheets = (openpyxl.load_workbook(tempdir)).sheetnames
+            wb=openpyxl.load_workbook(tempdir, read_only=True)
+            arr_of_sheets = wb.sheetnames
             combobox.configure(values=arr_of_sheets)
             combobox.set(arr_of_sheets[0])
             self.selectedSheet =arr_of_sheets[0]
@@ -693,10 +695,10 @@ class MainClass:
 
             label.configure(text="0/" + str(len(self.dirImages)))
             label.update()
-
+            workbook = openpyxl.load_workbook(self.filepath, data_only=True)
             try:
                 # opening workbook
-                workbook = openpyxl.load_workbook(self.filepath)
+
 
                 # opening sheet 1
                 worksheet = workbook[self.selectedSheet]
@@ -705,7 +707,9 @@ class MainClass:
                 end= int(self.rowEnd)+1
 
                 progressMax=end-start+1
-
+                arr=[]
+                for i in self.dirImages:
+                    arr.append(i)
                 finish = len(self.dirImages)
                 for i in range(start, end):
 
@@ -717,12 +721,14 @@ class MainClass:
 
                         if artical_number == imgNum:
                             # opening an image
-                            img = Image.open(str(self.imagePath + "/" + self.dirImages[j]))
+                            img = Image.open(str(self.imagePath + "/" + arr[j]))
                             img1 = openpyxl.drawing.image.Image(img)
 
                             # Set new image size
+
                             img1.width = self.size * img1.width / img1.height
                             img1.height = self.size
+
 
                             # Set row and column
                             worksheet.row_dimensions[i].height = (self.maxSize/4)*3
@@ -736,11 +742,12 @@ class MainClass:
                             worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
 
                             progressbar.set(float(i / progressMax))
-                            if i != len(self.dirImages):
-                                label.configure(text=str(i+1 - int(self.rowStart)) + "/" + str(len(self.dirImages)))
+                            if i != len(arr):
+                                label.configure(text=str(i+1 - int(self.rowStart)) + "/" + str(progressMax))
                             label.update()
 
                             break
+
                 progressbar.set(1)
                 label.configure(text="Please wait, changes are being applied to the file")
                 label.update()
