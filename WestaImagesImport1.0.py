@@ -716,6 +716,7 @@ class MainClass:
                 size=end1-start1
                 counter=-1
                 for i in toSheet.iter_rows():
+
                     counter+=1
                     label.configure(text=str(counter) + "/" + str(size))
                     label.update()
@@ -1061,16 +1062,17 @@ class MainClass:
                     blank = 0
                     for i in range(start, len(self.dirImages)):
                         if str(worksheet[self.columnArticles + str(i)].value)!="None":
-                            endd+=1
+                            endd+=1+blank
+                            blank=0
                         else:
                             blank +=1
-                            if blank==5:
+                            if blank==40:
                                 break
                         print(str(worksheet[self.columnArticles + str(i)].value))
 
                 print(endd)
 
-                end= endd+1
+                end = endd + 2
 
                 progressMax=end-start+1
                 arr=[]
