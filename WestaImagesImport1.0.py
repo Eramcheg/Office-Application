@@ -7,11 +7,11 @@ import os
 from tkinter import filedialog
 from openpyxl.styles import Alignment
 import customtkinter as ct
-
+from PIL import JpegImagePlugin
 
 ct.set_appearance_mode('dark')
 ct.set_default_color_theme("dark-blue")
-
+JpegImagePlugin._getmp = lambda x: None
 
 class MainClass:
     def __init__(self):
@@ -1065,8 +1065,8 @@ class MainClass:
                             endd+=1+blank
                             blank=0
                         else:
-                            blank +=1
-                            if blank==40:
+                            blank += 1
+                            if blank == 40:
                                 break
                         print(str(worksheet[self.columnArticles + str(i)].value))
 
@@ -1085,46 +1085,54 @@ class MainClass:
                     artical_number = str(worksheet[self.columnArticles + str(i)].value)
 
                     for j in range(finish):
-                        imgNum = os.path.splitext(self.dirImages[j])[0]
-                        if (os.path.splitext(self.dirImages[j])[1])==".jpg":
-                            if artical_number == imgNum:
-                                # opening an image
-                                img = Image.open(str(self.imagePath + "/" + arr[j]))
-                                img1 = openpyxl.drawing.image.Image(img)
+                        print(os.path.splitext(self.dirImages[j]))
+                        if len(os.path.splitext(self.dirImages[j]))>0:
+                            imgNum = os.path.splitext(self.dirImages[j])[0]
+                        if len(os.path.splitext(self.dirImages[j]))>1:
+                            extension = os.path.splitext(self.dirImages[j])[1]
+                            if extension ==".jpg":
+                                if artical_number == imgNum:
+                                    # opening an image
 
-                                # Set new image size
-
-                                img1.width = self.size * img1.width / img1.height
-                                img1.height = self.size
+                                    img = Image.open(str(self.imagePath + "/" + arr[j]))
 
 
-                                # Set row and column
-                                worksheet.row_dimensions[i].height = (self.maxSize/4)*3
 
-                                # width and height
 
-                                worksheet.column_dimensions[self.columnImages].width = img1.width/7.5
+                                    img1 = openpyxl.drawing.image.Image(img)
 
-                                cell = worksheet[self.columnImages + str(i)]
-                                cell.alignment = Alignment(horizontal='right')
-                                worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
 
-                                progressbar.set(float(i / progressMax))
-                                if i != len(arr):
-                                    label.configure(text=str(i+1 - int(self.rowStart)) + "/" + str(progressMax))
-                                label.update()
+                                    # Set new image size
 
-                                # if( i%2000==0):
-                                #     workbook.save(self.filepath)
-                                #     workbook = openpyxl.load_workbook(self.filepath, data_only=True)
-                                #     worksheet = workbook[self.selectedSheet]
-                                break
+                                    img1.width = self.size * img1.width / img1.height
+                                    img1.height = self.size
+
+
+                                    # Set row and column
+                                    worksheet.row_dimensions[i].height = (self.maxSize/4) * 3
+
+
+                                    # width and height
+                                    worksheet.column_dimensions[self.columnImages].width = img1.width/7.5
+
+
+                                    cell = worksheet[self.columnImages + str(i)]
+                                    cell.alignment = Alignment(horizontal='right')
+                                    worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
+
+                                    progressbar.set(float(i / progressMax))
+                                    if i != len(arr):
+                                        label.configure(text=str(i+1 - int(self.rowStart)) + "/" + str(progressMax))
+                                    label.update()
+
+                                    break
 
 
 
                 progressbar.set(1)
                 label.configure(text="Please wait, changes are being applied to the file")
                 label.update()
+                print(self.filepath)
                 workbook.save(self.filepath)  # Saving a document
                 label.configure(text="File data has been updated!", text_color="green")
                 label.update()
@@ -1133,9 +1141,10 @@ class MainClass:
             except PermissionError:
                 label.configure(text="Please, close active excel file and try again", text_color="orange")
                 label.update()
-            except:
-                label.configure(text="Something went wrong", text_color="orange")
-                label.update()
+            # except:
+            #     print()
+            #     label.configure(text="Something went wrong", text_color="orange")
+            #     label.update()
 
 #
 m = MainClass()
