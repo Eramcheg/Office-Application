@@ -6,10 +6,11 @@ from PIL import Image
 import os
 from tkinter import filedialog
 from openpyxl.styles import Alignment
-import customtkinter
+import customtkinter as ct
 
-customtkinter.set_appearance_mode('dark')
-customtkinter.set_default_color_theme("dark-blue")
+
+ct.set_appearance_mode('dark')
+ct.set_default_color_theme("dark-blue")
 
 
 class MainClass:
@@ -33,18 +34,39 @@ class MainClass:
         self.sheetSecond=None
         self.firstfileF2=''
         self.secondfileF2=''
+        self.onefileF2=''
 
+        self.colKeyA = 'A'
+        self.colKeyB = 'A'
+        self.colA = 'B'
+        self.colB = 'B'
+        self.startA = '1'
+        self.endA = '1'
+        self.startB = '1'
+        self.endB = '1'
+
+        self.TwoOrOne = None
+
+        self.columnsFrom=[]
+        self.columnsTo=[]
+        #self.indexColumnsFrom=['B','B','B','B']
+        #self.indexColumnsTo=['C','D','E','F']
+        self.indexColumnsFrom=[]
+        self.indexColumnsTo=[]
+
+        self.num_of_col=1
+        self.flag=True
 
     def startApp(self):
-        root = customtkinter.CTk()
+        root = ct.CTk()
         root.grid_columnconfigure(1, weight=1)
         root.grid_columnconfigure((2, 3), weight=0)
         root.grid_rowconfigure((0, 1, 2), weight=1)
 
-        frame=customtkinter.CTkFrame(root)
+        frame=ct.CTkFrame(root)
         frame.grid(row=0, column=0, rowspan=4,columnspan=4, sticky="nsew")
 
-        tabview = customtkinter.CTkTabview(frame, width=250)
+        tabview = ct.CTkTabview(frame, width=250)
         tabview.grid(row=0, column=0, padx=(0, 0), pady=(0, 0), sticky="nsew")
         tabview.add("Images Import")
         tabview.add("Synchronizing")
@@ -333,46 +355,46 @@ class MainClass:
 
         # ALL FRAMES
 
-        buttonFrame = customtkinter.CTkFrame(tabview.tab("Images Import"))
+        buttonFrame = ct.CTkFrame(tabview.tab("Images Import"))
         buttonFrame.grid(row=0, column=0, rowspan=4, sticky="nsew")
 
-        labelFrame = customtkinter.CTkFrame(tabview.tab("Images Import"))
+        labelFrame = ct.CTkFrame(tabview.tab("Images Import"))
         labelFrame.grid(row=0, column=1, sticky="nsew")
 
-        insertFrame = customtkinter.CTkFrame(tabview.tab("Images Import"), fg_color='transparent')
+        insertFrame = ct.CTkFrame(tabview.tab("Images Import"), fg_color='transparent')
         insertFrame.grid(row=1, column=1, sticky="nsew")
 
 
 
         # ALL LABELS
 
-        labelSheet = customtkinter.CTkLabel(buttonFrame, text="Select required sheet of excel file", font=('Arial', 13))
+        labelSheet = ct.CTkLabel(buttonFrame, text="Select required sheet of excel file", font=('Arial', 13))
         labelSheet.grid(row=2, column=0, padx=20, pady=0)
 
 
-        labelExcel = customtkinter.CTkLabel(labelFrame, text="Excel file path: file is not selected", text_color='red',
+        labelExcel = ct.CTkLabel(labelFrame, text="Excel file path: file is not selected", text_color='red',
                                             font=('Arial', 18))
         labelExcel.grid(row=1, column=0, columnspan=2, padx=(20, 0), pady=20, sticky="nsew")
 
 
-        labelImageFolder = customtkinter.CTkLabel(labelFrame, text="Image folder path: folder is not selected",
+        labelImageFolder = ct.CTkLabel(labelFrame, text="Image folder path: folder is not selected",
                                                   text_color='red', font=('Arial', 18))
         labelImageFolder.grid(row=7, column=0, columnspan=2, padx=20, pady=(10,0), sticky="nsew")
 
 
-        labelInstructionsCodes = customtkinter.CTkLabel(labelFrame, text="Select the excel column with codes location\n"
+        labelInstructionsCodes = ct.CTkLabel(labelFrame, text="Select the excel column with codes location\n"
                                                   " and column for images location", font=('Arial', 15))
         labelInstructionsCodes.grid(row=2, column=0, padx=20, pady=0, columnspan=2, sticky="nsew")
 
 
 
-        labelInstructionsImg = customtkinter.CTkLabel(labelFrame,
+        labelInstructionsImg = ct.CTkLabel(labelFrame,
                                                       text="Select the start row and end row for images placement",
                                                       font=('Arial', 15))
         labelInstructionsImg.grid(row=4, column=0, padx=20, pady=(10, 0), columnspan=2, sticky="nsew")
 
 
-        labelProgress = customtkinter.CTkLabel(insertFrame, text='Click Insert to insert images into excel file',
+        labelProgress = ct.CTkLabel(insertFrame, text='Click Insert to insert images into excel file',
                                                font=('Arial', 15))
         labelProgress.grid(row=2, column=1, padx=20, pady=(0, 0))
 
@@ -382,48 +404,46 @@ class MainClass:
 
         # ALL COMBOBOXES
             #combobox sheets
-        sheets = customtkinter.CTkComboBox(buttonFrame, values=[], command=self.sheetChanged)
+        sheets = ct.CTkComboBox(buttonFrame, values=[], command=self.sheetChanged)
         sheets.grid(row=3, column=0, padx=20, pady=1)
         sheets.set("Workbook sheet ")
 
 
 
             # combobox articles column and row
-        columnArticles = customtkinter.CTkComboBox(labelFrame, values=alphabet, font=('Arial', 12), command=self.articlesColumnChanged)
+        columnArticles = ct.CTkComboBox(labelFrame, values=alphabet, font=('Arial', 12), command=self.articlesColumnChanged)
         columnArticles.grid(row=3, column=0, padx=2, pady=0)
         columnArticles.set("Codes Column")
 
             # combobox images column and row
-        columnImg = customtkinter.CTkComboBox(labelFrame, values=alphabet, font=('Arial', 12),
+        columnImg = ct.CTkComboBox(labelFrame, values=alphabet, font=('Arial', 12),
                                               command=self.imagesColumnChanged)
         columnImg.grid(row=3, column=1, padx=2, pady=(0, 5))
         columnImg.set("Images Column")
 
 
-        rowStart = customtkinter.CTkComboBox(labelFrame, values=rows, font=('Arial', 12), command=self.articlesRowChanged)
+        rowStart = ct.CTkComboBox(labelFrame, values=rows, font=('Arial', 12), command=self.articlesRowChanged)
         rowStart.grid(row=5, column=0, padx=2, pady=0)
         rowStart.set("Start row")
 
-        rowEnd=customtkinter.CTkEntry(labelFrame, placeholder_text="Write end row(number)")
+        rowEnd = ct.CTkEntry(labelFrame, placeholder_text="Write end row(number)")
         rowEnd.grid(row=5, column=1, padx=(2,0), pady=0)
-        # rowEnd = customtkinter.CTkComboBox(labelFrame, values=rows, font=('Arial', 12), command=self.imagesRowChanged)
-        # rowEnd.grid(row=5, column=1, padx=2, pady=0)
-        # rowEnd.set("End row ")
 
 
-        labelSize=customtkinter.CTkLabel(buttonFrame, text="Write custom images height\nfor loading in excel (px).")
+
+        labelSize = ct.CTkLabel(buttonFrame, text="Write custom images height\nfor loading in excel (px).")
         labelSize.grid(row=5,column=0,padx=20,pady=0)
         labelSize.grid_remove()
-        entrySize=customtkinter.CTkEntry(buttonFrame, placeholder_text="Default = 200px")
+        entrySize = ct.CTkEntry(buttonFrame, placeholder_text="Default = 200px")
         entrySize.grid(row=6, column=0, padx=20,pady=0)
         entrySize.grid_remove()
-        buttonConfirmSize=customtkinter.CTkButton(buttonFrame, text="Confirm", command=lambda: self.confirmSwitch(entrySize))
+        buttonConfirmSize = ct.CTkButton(buttonFrame, text="Confirm", command=lambda: self.confirmSwitch(entrySize))
         buttonConfirmSize.grid(row=7, column=0, padx=20,pady=0)
         buttonConfirmSize.grid_remove()
 
 
         # OTHER ELEMENTS
-        progressbar_1 = customtkinter.CTkProgressBar(insertFrame)
+        progressbar_1 = ct.CTkProgressBar(insertFrame)
         progressbar_1.grid(row=3, column=1, padx=(20, 10), pady=(0, 10), sticky="ew")
         progressbar_1.set(0)
 
@@ -434,22 +454,22 @@ class MainClass:
         # ALL BUTTONS
 
             # Insert Images Button
-        buttonInsert = customtkinter.CTkButton(insertFrame, text="Insert Images", font=('Arial', 19),
+        buttonInsert = ct.CTkButton(insertFrame, text="Insert Images", font=('Arial', 19),
                                                command=lambda: self.saveImage(labelProgress, progressbar_1))
         buttonInsert.grid(row=1, column=1, padx=20, pady=10)
 
             # Open image folder button
-        buttonOpenImgFolder = customtkinter.CTkButton(buttonFrame, text="Load image folder", font=('Arial', 17),
+        buttonOpenImgFolder = ct.CTkButton(buttonFrame, text="Load image folder", font=('Arial', 17),
                                                       command=lambda: self.openImage(labelImageFolder, labelProgress))
         buttonOpenImgFolder.grid(row=8, column=0, padx=20, pady=(95,0))
 
             # Open excel file button
-        buttonOpenExcel = customtkinter.CTkButton(buttonFrame, text="Load excel file", font=('Arial', 17),
+        buttonOpenExcel = ct.CTkButton(buttonFrame, text="Load excel file", font=('Arial', 17),
                                                   command=lambda: self.openFile(labelExcel, labelProgress, sheets))
         buttonOpenExcel.grid(row=1, column=0, padx=20, pady=20)
 
 
-        confirmButton = customtkinter.CTkButton(labelFrame, text="Confirm", font=('Arial', 11),
+        confirmButton = ct.CTkButton(labelFrame, text="Confirm", font=('Arial', 11),
                                                 command=lambda: self.confirmEntry(rowEnd))
         confirmButton.grid(row=6, column=1, padx=0, pady=0)
 
@@ -457,14 +477,20 @@ class MainClass:
 
 
             #quit button
-        quitButton = customtkinter.CTkButton(buttonFrame, text="Quit", font=('Arial', 17), command=sys.exit)
+        quitButton = ct.CTkButton(buttonFrame, text="Quit", font=('Arial', 17), command=sys.exit)
         quitButton.grid(row=9, column=0, padx=20, pady=(60, 20), sticky="nsew")
 
 
-        switch_1 = customtkinter.CTkSwitch(master=buttonFrame, text="Show edition", onvalue="on", offvalue="off",
+        switch_1 = ct.CTkSwitch(master=buttonFrame, text="Show edition", onvalue="on", offvalue="off",
                                            command=lambda: self.hide_element(entrySize, switch_1, buttonConfirmSize,
                                                                              labelSize, quitButton, buttonOpenImgFolder))
         switch_1.grid(row=4, column=0, padx=20, pady=0)
+
+
+
+
+
+
 
 
 
@@ -479,7 +505,7 @@ class MainClass:
 
         #Live coding от ерамчика
 
-        mainFrame= customtkinter.CTkFrame(tabview.tab("Synchronizing"))
+        mainFrame= ct.CTkFrame(tabview.tab("Synchronizing"))
         mainFrame.grid(row=0, column=0, rowspan=4, sticky="nsew")
 
         userSet=['List to list', 'File to file']
@@ -487,46 +513,109 @@ class MainClass:
 
 
 
-        labelFile1 = customtkinter.CTkLabel(mainFrame, text="File path: file has is not selected")
-        labelFile1.grid(row=2, column=0, padx=20, pady=0)
+        labelFile1 = ct.CTkLabel(mainFrame, text="File path: file is not selected")
+        labelFile1.grid(row=2, column=0, columnspan=2, padx=20, pady=0)
 
-        labelFile2 = customtkinter.CTkLabel(mainFrame, text="File path: file has is not selected")
-        labelFile2.grid(row=2, column=1, padx=20, pady=0)
+        labelFile2 = ct.CTkLabel(mainFrame, text="File path: file is not selected")
+        labelFile2.grid(row=2, column=2, columnspan=2, padx=20, pady=0)
 
-        labelFile3 = customtkinter.CTkLabel(mainFrame, text="File path: file has is not selected")
-        labelFile3.grid(row=2, column=0, columnspan=2, padx=20, pady=0)
+        labelFile3 = ct.CTkLabel(mainFrame, text="File path: file is not selected")
+        labelFile3.grid(row=2, column=1, columnspan=2, padx=20, pady=0)
 
 
+        # COMBOBOXES
 
-        sheets1 = customtkinter.CTkComboBox(mainFrame, values=[], command=self.sheetChanged)
+        sheets1 = ct.CTkComboBox(mainFrame, values=[], command=self.sheetChangedOne)
         sheets1.grid(row=3, column=0, padx=20, pady=1)
-        sheets1.set("Workbook sheet ")
+        sheets1.set("Sheet 1 (from)")
 
-        sheets2 = customtkinter.CTkComboBox(mainFrame, values=[], command=self.sheetChanged)
+        sheets2 = ct.CTkComboBox(mainFrame, values=[], command=self.sheetChangedTwo)
         sheets2.grid(row=3, column=1, padx=20, pady=1)
-        sheets2.set("Workbook sheet ")
+        sheets2.set("Sheet 2 (to) ")
+
+
+
+
+        comboboxColumnKeyA = ct.CTkComboBox(mainFrame, values=alphabet, command=lambda event:self.valueChangedRowF2(event, "Key", "A"))
+        comboboxColumnKeyB = ct.CTkComboBox(mainFrame, values=alphabet, command=lambda event:self.valueChangedRowF2(event, "Key", "B"))
+
+        comboboxColumnKeyA.grid(row=5, column=0, padx=(20,5), pady=(5, 0))
+        comboboxColumnKeyB.grid(row=5, column=1, padx=(10,5), pady=(5, 0))
+
+
+        labelKeyA=ct.CTkLabel(mainFrame, text="Key column A")
+        labelKeyB=ct.CTkLabel(mainFrame, text="Key column B")
+        labelKeyA.grid(row=4, column=0, padx=20, pady=(4, 0))
+        labelKeyB.grid(row=4, column=1, padx=20, pady=(4, 0))
+
+        #comboboxColumnA = ct.CTkComboBox(mainFrame, values=alphabet, command=lambda event:self.valueChangedRowF2(event, "Col", "A"))
+        #comboboxColumnB = ct.CTkComboBox(mainFrame, values=alphabet, command=lambda event:self.valueChangedRowF2(event, "Col", "B"))
+        #labelA=ct.CTkLabel(mainFrame, text="Column A From")
+        #labelB=ct.CTkLabel(mainFrame, text="Column B To")
+        # labelA.grid(row=4, column=1, padx=20, pady=(4, 0))
+        # labelB.grid(row=4, column=3, padx=20, pady=(4, 0))
+        #comboboxColumnB.grid(row=5, column=3, padx=(5,10), pady=(5, 0))
+        #comboboxColumnA.grid(row=5, column=1, padx=(5,10), pady=(5, 0))
+        # Combobox_Row_Start_Key_A = ct.CTkComboBox(mainFrame, values=rows, command=lambda event:self.valueChangedRowF2(event, "Row", "A"))
+        # Entry_Row_End_Key_A = ct.CTkEntry(mainFrame, placeholder_text="Enter end A row")
+        # ConfirmA = ct.CTkButton(mainFrame, text="Confirm A" ,command=lambda:self.confirmEntryF2(Entry_Row_End_Key_A, 'A'))
+        # Combobox_Row_Start_Key_A.grid(row=6, column=0, padx=(20,5), pady=5)
+        # Entry_Row_End_Key_A.grid(row=6, column=1, padx=(5,10), pady=5)
+        # ConfirmA.grid(row=7, column=0, columnspan=2, padx=20, pady=5)
+
+        Combobox_Row_Start_Key_B = ct.CTkComboBox(mainFrame, values=rows, command=lambda event: self.valueChangedRowF2(event, "Row", "B"))
+        Combobox_Row_Start_Key_B.set("Enter first B row")
+        Entry_Row_End_Key_B = ct.CTkEntry(mainFrame, placeholder_text="Enter end B row")
+        ConfirmB=ct.CTkButton(mainFrame, text="Confirm B", command=lambda:self.confirmEntryF2(Entry_Row_End_Key_B, 'B'))
+
+        switchROWS = ct.CTkSwitch(master=mainFrame, text="Show edition", onvalue="on", offvalue="off",
+                                command=lambda: self.hideROWS(switchROWS,Combobox_Row_Start_Key_B, Entry_Row_End_Key_B, ConfirmB))
+        switchROWS.grid(row=6, column=0, columnspan=2, padx=20, pady=(5,0))
+        Combobox_Row_Start_Key_B.grid_forget()
+        Entry_Row_End_Key_B.grid_forget()
+        ConfirmB.grid_forget()
+
+
+
+
+        labelSelectedColumns=ct.CTkLabel(mainFrame, text="Select pairs of columns (import from -> to)")
+        labelSelectedColumns.grid(row=4, column=2, columnspan=2, padx=10, pady=4)
+        labelSelectedColumns.grid_forget()
+
+        combobox_Number_Columns=ct.CTkComboBox(mainFrame, values=rows, command=self.valueChangedNumOfCol)
+        combobox_Number_Columns.grid( row=9, column=0, padx=20, pady=5)
+
+        buttonSelectColumns = ct.CTkButton(mainFrame, text="Select Columns",
+                                           command=lambda: self.selectColumns(mainFrame, alphabet, buttonSelectColumns, root, combobox_Number_Columns, labelSelectedColumns))
+        buttonSelectColumns.grid(row=9, column=1, padx=20, pady=5)
+
+        self.selectColumns(mainFrame, alphabet, buttonSelectColumns, root, combobox_Number_Columns,
+                           labelSelectedColumns)
+
+
 
 
         # Open excel file button
-        buttonOpenExcel1 = customtkinter.CTkButton(mainFrame, text="Load first excel file", font=('Arial', 17),
+        buttonOpenExcel1 = ct.CTkButton(mainFrame, text="Load first excel file", font=('Arial', 17),
                                                    command=lambda:self.openFileFun2(sheets1, labelFile1, 1))
-        buttonOpenExcel1.grid(row=1, column=0, padx=20, pady=20)
+        buttonOpenExcel1.grid(row=1, column=0, columnspan=2, padx=20, pady=(2,0))
 
-        buttonOpenExcel2 = customtkinter.CTkButton(mainFrame, text="Load second excel file", font=('Arial', 17),
+        buttonOpenExcel2 = ct.CTkButton(mainFrame, text="Load second excel file", font=('Arial', 17),
                                                    command=lambda:self.openFileFun2(sheets2, labelFile2, 2))
-        buttonOpenExcel2.grid(row=1, column=1, padx=20, pady=20)
+        buttonOpenExcel2.grid(row=1, column=2,columnspan=2, padx=20, pady=(2,0))
 
-        buttonOpenExcel3 = customtkinter.CTkButton(mainFrame, text="Load excel file", font=('Arial', 17))
-        buttonOpenExcel3.grid(row=1, column=0,columnspan=2 ,padx=20, pady=20)
-
-
-
+        buttonOpenExcel3 = ct.CTkButton(mainFrame, text="Load excel file", font=('Arial', 17),
+                                                   command=lambda:self.openOneFileFun2(sheets1, sheets2, labelFile3))
+        buttonOpenExcel3.grid(row=1, column=1,columnspan=2, padx=20, pady=(2,0))
 
 
-        uploadSet = customtkinter.CTkComboBox(mainFrame, values=userSet,
-                                              command=lambda event: self.changedRelative( event,buttonOpenExcel1, buttonOpenExcel2,
-                                                                                          buttonOpenExcel3, labelFile1, labelFile2, labelFile3))
-        uploadSet.grid(row=0, column=0, columnspan=2, padx=20)
+
+        uploadSet = ct.CTkComboBox(mainFrame, values=userSet, text_color="red", font=('Arial', 14),
+                                              command=lambda event: self.changedRelative(event,uploadSet, buttonOpenExcel1, buttonOpenExcel2,
+                                              buttonOpenExcel3, labelFile1, labelFile2, labelFile3, sheets1, sheets2))
+        uploadSet.grid(row=0, column=1, columnspan=2, padx=20, pady=(0,5))
+        uploadSet.set("Sync type")
+
 
         buttonOpenExcel1.grid_remove()
         buttonOpenExcel2.grid_remove()
@@ -536,40 +625,300 @@ class MainClass:
         labelFile3.grid_remove()
 
 
+        labelProgressBar=ct.CTkLabel(mainFrame, text="Click Synchronize to start synchronization", font=('Arial', 17))
+        labelProgressBar.grid(row=13, column=0, columnspan=2, padx=20, pady=(5,0))
 
+        progressFn2=ct.CTkProgressBar(mainFrame)
+        progressFn2.grid(row=14, column=0, columnspan=2, padx=20, pady=(0,10))
+        progressFn2.set(0)
 
+        buttonSynchronize=ct.CTkButton(mainFrame, text="Synchronize", font=('Arial', 17),command = lambda:self.Synchronize(alphabet, labelProgressBar, progressFn2))
+        buttonSynchronize.grid(row=12, column=0, columnspan=2, padx=20, pady=0)
 
 
 
 
         root.mainloop()
+
+    def hideROWS(self,switch, combobox, entry, confirm):
+        if switch.get() == 'on':
+            combobox.grid(row=7, column=0, padx=(20, 5), pady=(5, 0))
+            entry.grid(row=7, column=1, padx=(10, 5), pady=(5, 0))
+            confirm.grid(row=8, column=0, columnspan=2, padx=20, pady=5)
+        else:
+            combobox.grid_remove()
+            entry.grid_remove()
+            confirm.grid_remove()
+
+
+
+    def valueChangedNumOfCol(self, event):
+        self.num_of_col=int(event)
+        print(self.num_of_col)
+
+    def Synchronize(self, alphabet, label, progress):
+        if self.sheetFirst != None and self.sheetSecond != None and len(self.indexColumnsTo) != 0 and len(self.indexColumnsFrom) != 0:
+
+            KEY_A = 0
+            KEY_B = 0
+            DATA_A = 0
+            DATA_B = 0
+            all=0
+
+            if self.TwoOrOne == "Two":
+                fromTable = openpyxl.load_workbook(self.firstfileF2)
+                toTable = openpyxl.load_workbook(self.secondfileF2)
+                fromSheet = fromTable[self.sheetFirst]
+                toSheet = toTable[self.sheetSecond]
+
+            else:
+                fromTable = openpyxl.load_workbook(self.onefileF2)
+                fromSheet = fromTable[self.sheetFirst]
+                toSheet = fromTable[self.sheetSecond]
+
+            for COLUMN in range( self.num_of_col):
+
+                COL_DATA_A=self.indexColumnsFrom[COLUMN]
+                COL_DATA_B=self.indexColumnsTo[COLUMN]
+
+                for i in range(len(alphabet)):
+                    if self.colKeyA == alphabet[i]:
+                        KEY_A = i + 1
+                        all += 1
+                    if self.colKeyB == alphabet[i]:
+                        KEY_B = i + 1
+                        all += 1
+                    if COL_DATA_A == alphabet[i]:
+                        DATA_A = i + 1
+                        all += 1
+                    if COL_DATA_B == alphabet[i]:
+                        DATA_B = i + 1
+                        all += 1
+                    if all > 3:
+                        break
+                all=0
+                print( DATA_A)
+                print(DATA_B)
+
+
+
+                arr=[]
+                for i in toSheet.iter_rows():
+                    arr.append(i)
+                start1 = int(self.startB)
+                if int(self.endB)==1:
+                    end1 = len(arr)
+                else:
+                    end1 = int(self.endB)
+
+                label.configure(text=str(0)+"/"+str(end1-start1), text_color='white')
+                label.update()
+                size=end1-start1
+                counter=-1
+                for i in toSheet.iter_rows():
+                    counter+=1
+                    label.configure(text=str(counter) + "/" + str(size))
+                    label.update()
+                    progress.set(counter / size)
+                    progress.update()
+                    id = i[KEY_B-1].value
+                    row_numb = i[KEY_B-1].row
+
+                    if row_numb>= start1 and row_numb<=end1:
+                        for j in fromSheet.iter_rows():
+                            if j[KEY_A-1].value == id:
+
+                                toSheet.cell(row=row_numb, column=DATA_B).value = j[DATA_A-1].value
+                                break
+
+            label.configure(text="Synchronization completed!", text_color='green')
+            if self.TwoOrOne=="Two":
+
+                toTable.save(self.secondfileF2)
+            else:
+                fromTable.save(self.onefileF2)
+
+
+
+    def selectColumns(self, window, numbers, this, root, combobox, label):
+
+        combobox.configure(state='disabled')
+        label.grid(row=4, column=2, columnspan=2, padx=10, pady=4)
+        # create label on CTkToplevel window
+        if len(self.indexColumnsFrom)<self.num_of_col  :
+            self.columnsFrom=[]
+            for j in range(self.num_of_col):
+                self.columnsFrom.append(ct.CTkComboBox(window, values=numbers, command=lambda event, l=j: self.valueChangedColumnFrom(event, l)))
+                if j == len(self.indexColumnsFrom) :
+                    self.indexColumnsFrom.append('A')
+                self.columnsFrom[j].set("From")
+                self.columnsFrom[j].grid(row=j+5, column=2, padx=5)
+            this.configure(text="Hide columns")
+            root.geometry("671x425")
+            root.update()
+            combobox.configure(state='disabled')
+            combobox.update()
+
+        else:
+            if self.flag:
+                this.configure(text="Show columns")
+                #root.geometry("375x425")
+                root.update()
+                for j in range(self.num_of_col):
+                    self.columnsFrom[j].grid_forget()
+
+                combobox.configure(state='normal')
+                combobox.update()
+                label.grid_forget()
+
+            else:
+                this.configure(text="Hide columns")
+                root.geometry("671x425")
+                root.update()
+                for j in range(self.num_of_col):
+                    self.columnsFrom[j].grid(row=j+5, column=2, padx=5)
+                combobox.configure(state='disabled')
+                combobox.update()
+
+        if len(self.indexColumnsTo) < self.num_of_col :
+            self.columnsTo=[]
+            for j in range(self.num_of_col):
+                self.columnsTo.append(ct.CTkComboBox(window, values=numbers, command=lambda event, l=j: self.valueChangedColumnTo(event, l)))
+                if j == len(self.indexColumnsTo):
+                    self.indexColumnsTo.append('A')
+                self.columnsTo[j].set("To")
+                self.columnsTo[j].grid(row=j+5, column=3, padx=5)
+            self.flag = True
+
+        else:
+            if self.flag:
+                for j in range(self.num_of_col):
+                    self.columnsTo[j].grid_forget()
+                self.flag = False
+            else:
+                for j in range(self.num_of_col):
+                    self.columnsTo[j].grid(row=j+5, column=3, padx=5)
+                self.flag = True
+        print(self.indexColumnsFrom)
+        print(self.indexColumnsTo)
+
+
+    def valueChangedColumnFrom(self,event, index):
+        self.indexColumnsFrom[index]=event
+        print(self.indexColumnsFrom)
+    def valueChangedColumnTo(self, event, index):
+        self.indexColumnsTo[index]=event
+        print(self.indexColumnsTo)
+
+    def sheetChangedOne(self, event):
+        self.sheetFirst = event
+
+
+    def sheetChangedTwo(self, event):
+        self.sheetSecond = event
+
+
+
+    def valueChangedRowF2(self, event, isKey, table):
+        if isKey=="Key":
+            if table == "A":
+                self.colKeyA = event
+                print(self.colKeyA)
+            else:
+                self.colKeyB = event
+                print(self.colKeyB)
+        elif isKey=="Row":
+            if table == "A":
+                self.startA=int(event)
+                print(self.startA)
+            else:
+                self.startB = int(event)
+                print(self.startB)
+        else:
+            if table == "A":
+                self.colA = event
+                print(self.colA)
+            else:
+                self.colB = event
+                print(self.colB)
+
+
+    def confirmEntryF2(self, endRow, Is):
+        try:
+            if Is=='A':
+                self.endA = int(endRow.get())
+                print(self.endA)
+            else:
+                self.endB = int(endRow.get())
+                print(self.endB)
+            endRow.configure(text_color="green")
+            endRow.update()
+
+        except:
+            endRow.configure(text_color="red")
+            endRow.configure(placeholder_text="Value must be a num!")
+
     def openFileFun2(self, comboboxFirst, label, num):
         tempdir = filedialog.askopenfilename(initialdir="/", title="Select An Excel File", filetypes=(
             ("excel files", "*.xlsx"), ("All files", "*.*")))
         if len(tempdir) > 0:
+            arr_of_sheets = (openpyxl.load_workbook(tempdir, read_only=True)).sheetnames
             if num==1:
                 self.firstfileF2=tempdir
-
+                self.sheetFirst = arr_of_sheets[0]
             else:
                 self.secondfileF2=tempdir
+                self.sheetSecond = arr_of_sheets[0]
             label.configure(text="Excel file path: " + tempdir, text_color='green')
-            arr_of_sheets = (openpyxl.load_workbook(tempdir)).sheetnames
+
             comboboxFirst.configure(values=arr_of_sheets)
             comboboxFirst.set(arr_of_sheets[0])
-            self.selectedSheet =arr_of_sheets[0]
+
             comboboxFirst.update()
             comboboxFirst.configure()
         label.update()
-    def changedRelative(self, event, but1, but2, but3, lbl1, lbl2, lbl3):
+
+    def openOneFileFun2(self, comboboxFirst, comboboxSecond, label):
+        tempdir = filedialog.askopenfilename(initialdir="/", title="Select An Excel File", filetypes=(
+            ("excel files", "*.xlsx"), ("All files", "*.*")))
+        if len(tempdir) > 0:
+
+            self.onefileF2=tempdir
+            print(self.onefileF2)
+            label.configure(text="Excel file path: " + tempdir, text_color='green')
+            arr_of_sheets = (openpyxl.load_workbook(tempdir, read_only=True)).sheetnames
+            comboboxFirst.configure(values=arr_of_sheets)
+            comboboxFirst.set(arr_of_sheets[0])
+            comboboxSecond.configure(values=arr_of_sheets)
+            comboboxSecond.set(arr_of_sheets[0])
+            self.sheetFirst =arr_of_sheets[0]
+            self.sheetSecond=arr_of_sheets[0]
+            comboboxFirst.update()
+            comboboxSecond.update()
+        label.update()
+
+
+    def changedRelative(self, event,uploadself ,but1, but2, but3, lbl1, lbl2, lbl3, sh1, sh2):
         print(event)
+        uploadself.configure(text_color="green")
+        sh1.configure(values=[])
+        sh2.configure(values=[])
+        sh1.set("Workbook sheet 1")
+        sh2.set("Workbook sheet 2")
+        sh1.update()
+        sh2.update()
         if event == "List to list":
+            self.firstfileF2=None
             but3.grid()
             lbl3.grid()
             but1.grid_remove()
             but2.grid_remove()
             lbl1.grid_remove()
             lbl2.grid_remove()
+            self.TwoOrOne="One"
         else:
+            self.secondfileF2=None
+            self.TwoOrOne="Two"
             but3.grid_remove()
             lbl3.grid_remove()
             but1.grid()
@@ -619,6 +968,7 @@ class MainClass:
     def sheetChanged(self, event):
         self.selectedSheet = event
         print(self.selectedSheet)
+
 
     def articlesColumnChanged(self, event):
         self.columnArticles = event
@@ -682,7 +1032,7 @@ class MainClass:
             label.update()
             labelInsert.update()
             self.dirImages = os.listdir(tempdir)
-            self.rowEnd = len(self.dirImages)
+
             # rowEnd.set("Default = "+str(self.rowEnd))
             # rowEnd.update()
             self.imagePath = tempdir
@@ -702,9 +1052,25 @@ class MainClass:
 
                 # opening sheet 1
                 worksheet = workbook[self.selectedSheet]
+                print(str(worksheet["A" + str(4)].value))
+
 
                 start = int(self.rowStart)
-                end= int(self.rowEnd)+1
+                endd=0
+                if int(self.rowEnd)==2:
+                    blank = 0
+                    for i in range(start, len(self.dirImages)):
+                        if str(worksheet[self.columnArticles + str(i)].value)!="None":
+                            endd+=1
+                        else:
+                            blank +=1
+                            if blank==5:
+                                break
+                        print(str(worksheet[self.columnArticles + str(i)].value))
+
+                print(endd)
+
+                end= endd+1
 
                 progressMax=end-start+1
                 arr=[]
@@ -718,35 +1084,41 @@ class MainClass:
 
                     for j in range(finish):
                         imgNum = os.path.splitext(self.dirImages[j])[0]
+                        if (os.path.splitext(self.dirImages[j])[1])==".jpg":
+                            if artical_number == imgNum:
+                                # opening an image
+                                img = Image.open(str(self.imagePath + "/" + arr[j]))
+                                img1 = openpyxl.drawing.image.Image(img)
 
-                        if artical_number == imgNum:
-                            # opening an image
-                            img = Image.open(str(self.imagePath + "/" + arr[j]))
-                            img1 = openpyxl.drawing.image.Image(img)
+                                # Set new image size
 
-                            # Set new image size
-
-                            img1.width = self.size * img1.width / img1.height
-                            img1.height = self.size
+                                img1.width = self.size * img1.width / img1.height
+                                img1.height = self.size
 
 
-                            # Set row and column
-                            worksheet.row_dimensions[i].height = (self.maxSize/4)*3
+                                # Set row and column
+                                worksheet.row_dimensions[i].height = (self.maxSize/4)*3
 
-                            # width and height
+                                # width and height
 
-                            worksheet.column_dimensions[self.columnImages].width = img1.width/7.5
+                                worksheet.column_dimensions[self.columnImages].width = img1.width/7.5
 
-                            cell = worksheet[self.columnImages + str(i)]
-                            cell.alignment = Alignment(horizontal='right')
-                            worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
+                                cell = worksheet[self.columnImages + str(i)]
+                                cell.alignment = Alignment(horizontal='right')
+                                worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
 
-                            progressbar.set(float(i / progressMax))
-                            if i != len(arr):
-                                label.configure(text=str(i+1 - int(self.rowStart)) + "/" + str(progressMax))
-                            label.update()
+                                progressbar.set(float(i / progressMax))
+                                if i != len(arr):
+                                    label.configure(text=str(i+1 - int(self.rowStart)) + "/" + str(progressMax))
+                                label.update()
 
-                            break
+                                # if( i%2000==0):
+                                #     workbook.save(self.filepath)
+                                #     workbook = openpyxl.load_workbook(self.filepath, data_only=True)
+                                #     worksheet = workbook[self.selectedSheet]
+                                break
+
+
 
                 progressbar.set(1)
                 label.configure(text="Please wait, changes are being applied to the file")
