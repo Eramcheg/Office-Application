@@ -1093,9 +1093,12 @@ class MainClass:
                 progressMax=end-start+1
 
                 i=start-1
-                max_width=float(self.size/7.5) + 1
 
+                #Width of cells
+                max_width=float(self.size/7.5) + 1
                 worksheet.column_dimensions[self.columnImages].width = max_width
+
+
                 while i < end:
                     i += 1
 
@@ -1139,7 +1142,11 @@ class MainClass:
                                     cell.alignment = Alignment(horizontal='right')
                                     worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
 
+
+
                                     progressbar.set(float(i / progressMax))
+
+
 
                                     if i != len(arr):
                                         label.configure(text=str(i+1 - int(self.rowStart)) + "/" + str(progressMax))
@@ -1169,10 +1176,10 @@ class MainClass:
             except PermissionError:
                 label.configure(text="Please, close active excel file and try again", text_color="orange")
                 label.update()
-            # except:
-            #     print()
-            #     label.configure(text="Something went wrong", text_color="orange")
-            #     label.update()
+            except:
+                print()
+                label.configure(text="Something went wrong", text_color="orange")
+                label.update()
 
 #
 m = MainClass()
