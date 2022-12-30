@@ -474,16 +474,17 @@ class MainClass:
         confirmButton.grid(row=6, column=1, padx=0, pady=0)
 
 
-
+        restartButton=ct.CTkButton(buttonFrame, text="Restart", font=('Arial', 17), command=self.restart)
+        restartButton.grid(row=9, column=0, padx=20, pady=(15, 5))
 
             #quit button
         quitButton = ct.CTkButton(buttonFrame, text="Quit", font=('Arial', 17), command=sys.exit)
-        quitButton.grid(row=9, column=0, padx=20, pady=(60, 20), sticky="nsew")
+        quitButton.grid(row=10, column=0, padx=20, pady=(10, 20), sticky="nsew")
 
 
         switch_1 = ct.CTkSwitch(master=buttonFrame, text="Show edition", onvalue="on", offvalue="off",
                                            command=lambda: self.hide_element(entrySize, switch_1, buttonConfirmSize,
-                                                                             labelSize, quitButton, buttonOpenImgFolder))
+                                                                             labelSize, quitButton, buttonOpenImgFolder, restartButton))
         switch_1.grid(row=4, column=0, padx=20, pady=0)
 
 
@@ -938,33 +939,40 @@ class MainClass:
 
 
 
+
+    def restart(self):
+        os.execl(sys.executable, sys.executable, *sys.argv)
+
     def confirmSwitch(self, entrySize):
 
         try:
             self.size=int(entrySize.get())
-            if self.size > self.maxSize:
-                self.maxSize=self.size
+            #if self.size > self.maxSize:
+            self.maxSize = self.size
             entrySize.configure(text_color="green")
             entrySize.update()
             print(self.rowEnd)
+
         except:
             entrySize.configure(text_color="red")
             entrySize.configure(placeholder_text="Value must be a num!")
 
-    def hide_element(self, entrySize, switch1, confirm, labelSize, quitBut, openImg):
+    def hide_element(self, entrySize, switch1, confirm, labelSize, quitBut, openImg,  restbut):
         if switch1.get()=='off':
             entrySize.grid_remove()
             confirm.grid_remove()
             labelSize.grid_remove()
-            quitBut.grid(pady=8)
-            openImg.grid(pady=(95,50))
+            quitBut.grid( pady=(10, 10))
+            openImg.grid(pady=(95, 0))
+            restbut.grid(pady=(14, 10))
 
         else:
             entrySize.grid()
             confirm.grid()
             labelSize.grid()
-            quitBut.grid(pady=50)
+            quitBut.grid( pady=(10, 20))
             openImg.grid(pady=9)
+            restbut.grid(pady=(5, 10))
 
     def sheetChanged(self, event):
         self.selectedSheet = event
@@ -1044,7 +1052,7 @@ class MainClass:
 
         if self.filepath != '' and self.dirImages != []:
 
-            label.configure(text="0/" + str(len(self.dirImages)))
+            label.configure(text="0/" + str(len(self.dirImages)), text_color='white')
             label.update()
             workbook = openpyxl.load_workbook(self.filepath, data_only=True)
             try:
@@ -1055,49 +1063,56 @@ class MainClass:
                 worksheet = workbook[self.selectedSheet]
                 print(str(worksheet["A" + str(4)].value))
 
+                arr = []
+
+                for i in range(len(self.dirImages)):
+                    if len(os.path.splitext(self.dirImages[i])) > 1:
+                        if os.path.splitext(self.dirImages[i])[1] == '.jpg':
+                            arr.append(self.dirImages[i])
+                finish = len(arr)
+
 
                 start = int(self.rowStart)
-                endd=0
-                if int(self.rowEnd)==2:
+                endd = 0
+                if int(self.rowEnd) == 2:
                     blank = 0
-                    for i in range(start, len(self.dirImages)):
+                    for i in range(start, finish):
                         if str(worksheet[self.columnArticles + str(i)].value)!="None":
-                            endd+=1+blank
-                            blank=0
+                            endd += 1+blank
+                            blank = 0
                         else:
                             blank += 1
                             if blank == 40:
                                 break
-                        print(str(worksheet[self.columnArticles + str(i)].value))
+                else:
+                    endd=int(self.rowEnd)
 
-                print(endd)
 
                 end = endd + 2
 
                 progressMax=end-start+1
-                arr=[]
-                for i in self.dirImages:
-                    arr.append(i)
-                finish = len(self.dirImages)
-                for i in range(start, end):
+
+                i=start-1
+                max_width=float(self.size/7.5) + 1
+
+                worksheet.column_dimensions[self.columnImages].width = max_width
+                while i < end:
+                    i += 1
 
                     # unique number of product in cell
                     artical_number = str(worksheet[self.columnArticles + str(i)].value)
 
-                    for j in range(finish):
-                        print(os.path.splitext(self.dirImages[j]))
-                        if len(os.path.splitext(self.dirImages[j]))>0:
-                            imgNum = os.path.splitext(self.dirImages[j])[0]
-                        if len(os.path.splitext(self.dirImages[j]))>1:
-                            extension = os.path.splitext(self.dirImages[j])[1]
-                            if extension ==".jpg":
-                                if artical_number == imgNum:
+                    j=0
+                    while j < finish:
+
+                        if len(os.path.splitext(arr[j])) > 0:
+
+                            imgNum = os.path.splitext(arr[j])[0]
+
+                            if artical_number == imgNum:
+
                                     # opening an image
-
                                     img = Image.open(str(self.imagePath + "/" + arr[j]))
-
-
-
 
                                     img1 = openpyxl.drawing.image.Image(img)
 
@@ -1113,26 +1128,39 @@ class MainClass:
 
 
                                     # width and height
-                                    worksheet.column_dimensions[self.columnImages].width = img1.width/7.5
+                                    if img1.width/7.5 > max_width:
+                                        worksheet.column_dimensions[self.columnImages].width = img1.width/7.5 + 1.9
+                                        #max_width=img1.width/7.5 + 1.5
 
+
+                                    #Adding and image
 
                                     cell = worksheet[self.columnImages + str(i)]
                                     cell.alignment = Alignment(horizontal='right')
                                     worksheet.add_image(img1, self.columnImages + str(i))  # Adding image to worksheet
 
                                     progressbar.set(float(i / progressMax))
+
                                     if i != len(arr):
                                         label.configure(text=str(i+1 - int(self.rowStart)) + "/" + str(progressMax))
                                     label.update()
 
+
+                                    arr.pop(j)
+                                    finish-=1
+                                    j -= 1
+
+
                                     break
+                        j += 1
+
 
 
 
                 progressbar.set(1)
                 label.configure(text="Please wait, changes are being applied to the file")
                 label.update()
-                print(self.filepath)
+
                 workbook.save(self.filepath)  # Saving a document
                 label.configure(text="File data has been updated!", text_color="green")
                 label.update()
