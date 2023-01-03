@@ -57,6 +57,9 @@ class MainClass:
         self.num_of_col=1
         self.flag=True
 
+        self.width_window=672
+        self.height_window=425
+
     def startApp(self):
         root = ct.CTk()
         root.grid_columnconfigure(1, weight=1)
@@ -746,17 +749,39 @@ class MainClass:
 
         combobox.configure(state='disabled')
         label.grid(row=4, column=2, columnspan=2, padx=10, pady=4)
+        self.width_window = 631
+        self.height_window = 465
         # create label on CTkToplevel window
-        if len(self.indexColumnsFrom)<self.num_of_col  :
-            self.columnsFrom=[]
-            for j in range(self.num_of_col):
-                self.columnsFrom.append(ct.CTkComboBox(window, values=numbers, command=lambda event, l=j: self.valueChangedColumnFrom(event, l)))
-                if j == len(self.indexColumnsFrom) :
-                    self.indexColumnsFrom.append('A')
-                self.columnsFrom[j].set("From")
-                self.columnsFrom[j].grid(row=j+5, column=2, padx=5)
+        if len(self.indexColumnsFrom) < self.num_of_col:
+            #self.columnsFrom.clear()
+            j=0
+            leng=len(self.columnsFrom)
+            col=2
+            self.width_window=631
+            self.height_window=465
+            while j < self.num_of_col:
+
+                if j % 11 == 0 and j != 0:
+                    col += 2
+                    self.width_window += 210
+                if j == 3:
+                    self.height_window += 10
+                if j > 4 and j < 6:
+                    self.height_window += 30
+                if j >= 6 and j < 11:
+                    self.height_window += 16
+
+                row = j % 11
+                if(j>=leng):
+                    self.columnsFrom.append(ct.CTkComboBox(window, values=numbers, command=lambda event, l=j: self.valueChangedColumnFrom(event, l), width=100))
+                    if j == len(self.indexColumnsFrom):
+                        self.indexColumnsFrom.append('A')
+                    self.columnsFrom[j].set(str(j+1) +". From")
+
+                self.columnsFrom[j].grid(row=row+5, column=col, padx=5)
+                j += 1
             this.configure(text="Hide columns")
-            root.geometry("671x425")
+            root.geometry(str(self.width_window)+"x"+str(self.height_window))
             root.update()
             combobox.configure(state='disabled')
             combobox.update()
@@ -768,38 +793,71 @@ class MainClass:
                 root.update()
                 for j in range(self.num_of_col):
                     self.columnsFrom[j].grid_forget()
-
+                root.geometry("671x465")
                 combobox.configure(state='normal')
                 combobox.update()
                 label.grid_forget()
 
             else:
                 this.configure(text="Hide columns")
-                root.geometry("671x425")
+                #root.geometry(str(self.width_window)+"x"+str(self.height_window))
                 root.update()
-                for j in range(self.num_of_col):
-                    self.columnsFrom[j].grid(row=j+5, column=2, padx=5)
+                self.width_window = 631
+                self.height_window = 465
+                j = 0
+                col = 2
+                while j < self.num_of_col:
+
+                    if j % 11 == 0 and j != 0:
+                        col += 2
+                        self.width_window += 210
+                    if j == 3:
+                        self.height_window += 10
+                    if j > 4 and j < 6:
+                        self.height_window += 35
+                    if j>=6 and j<11:
+                        self.height_window += 5
+
+
+                    row = j % 11
+                    self.columnsFrom[j].grid(row=row+5, column=col, padx=5)
+                    j+=1
                 combobox.configure(state='disabled')
+                root.geometry(str(self.width_window) + "x" + str(self.height_window))
                 combobox.update()
 
         if len(self.indexColumnsTo) < self.num_of_col :
-            self.columnsTo=[]
-            for j in range(self.num_of_col):
-                self.columnsTo.append(ct.CTkComboBox(window, values=numbers, command=lambda event, l=j: self.valueChangedColumnTo(event, l)))
-                if j == len(self.indexColumnsTo):
-                    self.indexColumnsTo.append('A')
-                self.columnsTo[j].set("To")
-                self.columnsTo[j].grid(row=j+5, column=3, padx=5)
+            #self.columnsTo.clear()
+            j = 0
+            leng = len(self.columnsTo)
+            col = 3
+            while j < self.num_of_col:
+                if j % 11 == 0 and j != 0:
+                    col += 2
+                row = j % 11
+                if (j >= leng):
+                    self.columnsTo.append(ct.CTkComboBox(window, values=numbers, command=lambda event, l=j: self.valueChangedColumnTo(event, l), width=100))
+                    if j == len(self.indexColumnsTo):
+                        self.indexColumnsTo.append('A')
+                    self.columnsTo[j].set(str(j+1) +". To")
+                self.columnsTo[j].grid(row=row+5, column=col, padx=5)
+                j += 1
             self.flag = True
 
         else:
             if self.flag:
                 for j in range(self.num_of_col):
-                    self.columnsTo[j].grid_forget()
+                    self.columnsTo[j].grid_remove()
                 self.flag = False
             else:
+                j = 0
+                col = 3
                 for j in range(self.num_of_col):
-                    self.columnsTo[j].grid(row=j+5, column=3, padx=5)
+                    if j % 11 == 0 and j != 0:
+                        col += 2
+                    row = j % 11
+                    self.columnsTo[j].grid(row=row+5, column=col, padx=5)
+                    #self.columnsTo[j].set(self.indexColumnsTo[])
                 self.flag = True
         print(self.indexColumnsFrom)
         print(self.indexColumnsTo)
@@ -1156,8 +1214,6 @@ class MainClass:
                                     arr.pop(j)
                                     finish-=1
                                     j -= 1
-
-
                                     break
                         j += 1
 
