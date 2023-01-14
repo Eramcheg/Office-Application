@@ -1253,7 +1253,8 @@ class Function3:
                                     command=lambda: self.OpenLatexFN3(labelLatex))
         LatexFileFN3.grid(row=0, column=1, padx=20, pady=(20, 0))
 
-        SynchronizeButton = ct.CTkButton(Area, text="Synchronize")
+        SynchronizeButton = ct.CTkButton(Area, text="Synchronize",font=('Arial', 17) ,command=self.Synchronize)
+        SynchronizeButton.grid(row=10, column=0, columnspan=2, padx=20, pady=10)
 
     def OpenLatexFN3(self, label):
         tempdir = filedialog.askdirectory()
@@ -1283,6 +1284,9 @@ class Function3:
             comboboxSheets.set(arr_of_sheets[0])
             comboboxSheets.update()
             label.update()
+    def Synchronize(self):
+        if self.FileExcel!=None and self.FileLatex!=None:
+            print("Synchronized")
 
 #
 m = MainClass()
