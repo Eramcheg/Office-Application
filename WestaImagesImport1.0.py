@@ -60,11 +60,23 @@ class MainClass:
         self.width_window=672
         self.height_window=425
 
+
+
+        #FUNCTION 3
+        self.FileExcel = None
+        self.sheetExcel = None
+        self.FileLatex = None
+
+
     def startApp(self):
         root = ct.CTk()
         root.grid_columnconfigure(1, weight=1)
         root.grid_columnconfigure((2, 3), weight=0)
         root.grid_rowconfigure((0, 1, 2), weight=1)
+
+
+
+
 
         frame=ct.CTkFrame(root)
         frame.grid(row=0, column=0, rowspan=4,columnspan=4, sticky="nsew")
@@ -73,7 +85,7 @@ class MainClass:
         tabview.grid(row=0, column=0, padx=(0, 0), pady=(0, 0), sticky="nsew")
         tabview.add("Images Import")
         tabview.add("Synchronizing")
-        tabview.add("Tab 3")
+        tabview.add("Latex Export")
         tabview.tab("Images Import").grid_columnconfigure(1, weight=1)
         tabview.tab("Images Import").grid_columnconfigure((2, 3), weight=0)
         tabview.tab("Images Import").grid_rowconfigure((0, 1, 2), weight=1)
@@ -82,6 +94,12 @@ class MainClass:
         tabview.tab("Synchronizing").grid_columnconfigure((2, 3), weight=0)
         tabview.tab("Synchronizing").grid_rowconfigure((0, 1, 2), weight=1)
 
+        tabview.tab("Latex Export").grid_columnconfigure(1, weight=1)
+        tabview.tab("Latex Export").grid_columnconfigure((2, 3), weight=0)
+        tabview.tab("Latex Export").grid_rowconfigure((0, 1, 2), weight=1)
+
+        fn3 = Function3()
+        fn3.Fn3(tabview)
 
 
         # all possible columns
@@ -350,7 +368,7 @@ class MainClass:
                 '2978', '2979', '2980', '2981', '2982', '2983', '2984', '2985', '2986', '2987', '2988', '2989', '2990',
                 '2991', '2992', '2993', '2994', '2995', '2996', '2997', '2998', '2999', '3000']
 
-        root.geometry("645x425")
+        root.geometry()
         root.title("Westa GmbH Images Import")
         root.configure(background="black")
 
@@ -366,6 +384,7 @@ class MainClass:
 
         insertFrame = ct.CTkFrame(tabview.tab("Images Import"), fg_color='transparent')
         insertFrame.grid(row=1, column=1, sticky="nsew")
+
 
 
 
@@ -642,7 +661,61 @@ class MainClass:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        #FUNCTION 3
+
+
+
+
+
+
+
+
+
+
+
         root.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def hideROWS(self,switch, combobox, entry, confirm):
         if switch.get() == 'on':
@@ -781,7 +854,7 @@ class MainClass:
                 self.columnsFrom[j].grid(row=row+5, column=col, padx=5)
                 j += 1
             this.configure(text="Hide columns")
-            root.geometry(str(self.width_window)+"x"+str(self.height_window))
+            root.geometry()#str(self.width_window)+"x"+str(self.height_window))
             root.update()
             combobox.configure(state='disabled')
             combobox.update()
@@ -793,7 +866,7 @@ class MainClass:
                 root.update()
                 for j in range(self.num_of_col):
                     self.columnsFrom[j].grid_forget()
-                root.geometry("671x465")
+                root.geometry()#"671x465")
                 combobox.configure(state='normal')
                 combobox.update()
                 label.grid_forget()
@@ -823,7 +896,7 @@ class MainClass:
                     self.columnsFrom[j].grid(row=row+5, column=col, padx=5)
                     j+=1
                 combobox.configure(state='disabled')
-                root.geometry(str(self.width_window) + "x" + str(self.height_window))
+                root.geometry()#str(self.width_window) + "x" + str(self.height_window))
                 combobox.update()
 
         if len(self.indexColumnsTo) < self.num_of_col :
@@ -1236,6 +1309,66 @@ class MainClass:
                 print()
                 label.configure(text="Something went wrong", text_color="orange")
                 label.update()
+
+
+class Function3:
+
+    def __init__(self):
+        self.FileLatex=None
+        self.FileExcel=None
+
+    def Fn3(self, tabview):
+        Area = ct.CTkFrame(tabview.tab('Latex Export'))
+        Area.grid(row=0, column=0, rowspan=4, sticky="nsew")
+
+        labelFileExcel = ct.CTkLabel(Area, text="File path: file is not selected")
+        labelFileExcel.grid(row=1, column=0, padx=20, pady=(0, 10))
+
+        sheetsExcel = ct.CTkComboBox(Area)
+        sheetsExcel.grid(row=2, column=0, padx=20, pady=10)
+        sheetsExcel.set("Select excel sheet")
+
+        ExcelFileFN3 = ct.CTkButton(Area, text="Open Excel File", font=('Arial', 17),
+                                    command=lambda: self.OpenExcelFN3(labelFileExcel, sheetsExcel))
+        ExcelFileFN3.grid(row=0, column=0, padx=20, pady=(20, 0))
+
+        labelLatex = ct.CTkLabel(Area, text="Export folder path: folder is not selected")
+        labelLatex.grid(row=1, column=1, padx=20, pady=(0, 10))
+
+        LatexFileFN3 = ct.CTkButton(Area, text="Open Latex File", font=('Arial', 17),
+                                    command=lambda: self.OpenLatexFN3(labelLatex))
+        LatexFileFN3.grid(row=0, column=1, padx=20, pady=(20, 0))
+
+        SynchronizeButton = ct.CTkButton(Area, text="Synchronize")
+
+    def OpenLatexFN3(self, label):
+        tempdir = filedialog.askdirectory()
+        if len(tempdir) > 0:
+            self.FileLatex = tempdir
+
+            print(self.FileLatex)
+
+            label.configure(text="Export folder path: " + tempdir, text_color='green')
+
+            label.update()
+
+    def OpenExcelFN3(self, label, comboboxSheets):
+        tempdir = filedialog.askopenfilename(initialdir="/", title="Select An Excel File", filetypes=(
+            ("excel files", "*.xlsx"), ("All files", "*.*")))
+        if len(tempdir) > 0:
+            arr_of_sheets = (openpyxl.load_workbook(tempdir, read_only=True)).sheetnames
+
+            self.FileExcel = tempdir
+            self.sheetFirst = arr_of_sheets[0]
+
+            print(self.FileExcel)
+            print(self.sheetFirst)
+            label.configure(text="Excel file path: " + tempdir, text_color='green')
+
+            comboboxSheets.configure(values=arr_of_sheets)
+            comboboxSheets.set(arr_of_sheets[0])
+            comboboxSheets.update()
+            label.update()
 
 #
 m = MainClass()
