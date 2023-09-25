@@ -897,12 +897,12 @@ class Function2:
                     label.update()
                     progress.set(counter / size)
                     progress.update()
-                    id = i[KEY_B - 1].value
+                    id = str(i[KEY_B - 1].value)
                     row_numb = i[KEY_B - 1].row
 
                     if row_numb >= start1 and row_numb <= end1:
                         for j in fromSheet.iter_rows():
-                            if j[KEY_A - 1].value == id:
+                            if str(j[KEY_A - 1].value) == id:
                                 toSheet.cell(row=row_numb, column=DATA_B).value = j[DATA_A - 1].value
                                 break
 
